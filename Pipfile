@@ -12,6 +12,7 @@ google-genai = "*"
 black = "*"
 uvicorn = "*"
 google-generativeai = "*"
+mcp = "*"
 
 [dev-packages]
 
