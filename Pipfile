@@ -6,15 +6,25 @@ name = "pypi"
 [packages]
 streamlit = "*"
 python-dotenv = "*"
-fastapi = "*"
 pydantic = "*"
 google-genai = "*"
 black = "*"
 uvicorn = "*"
 google-generativeai = "*"
 mcp = "*"
+fastapi-mcp = "*"
+pytz = "*"
+tzdata = "*"
+numpy = "*"
+pandas = "*"
+yfinance = "*"
+fastapi = "*"
+python-dateutil = "*"
 
 [dev-packages]
 
 [requires]
 python_version = "3.13"
+
+[pipenv]
+allow_prereleases = true
