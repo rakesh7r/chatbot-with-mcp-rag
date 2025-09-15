@@ -33,3 +33,7 @@ async def chat(req: ChatRequest):
             )
     except Exception as e:
         return JSONResponse(content={"error": str(e)}, status_code=500)
+
+@router.get('/upload_file')
+async def upload_file(request: Request):
+    return JSONResponse(content={"message": "File upload endpoint"}, status_code=200)

@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException
-import yfinance as yf
+from services import yfin as yfin_service
 
 router = APIRouter(tags=["yfin"], prefix="/api/yfin")
 
@@ -8,122 +8,52 @@ router = APIRouter(tags=["yfin"], prefix="/api/yfin")
 # ------------------------------
 @router.get("/stock/{symbol}/price", operation_id="get_stock_current_price")
 async def get_stock_current_price(symbol: str) -> dict:
-    try:
-        ticker = yf.Ticker(symbol)
-        current_price = ticker.info.get("currentPrice")
-        if current_price:
-            return {"symbol": symbol, "current_price": current_price}
-        raise HTTPException(status_code=404, detail="Current price not available for this symbol.")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error fetching stock price: {e}")
-
+    return await yfin_service.get_stock_current_price(symbol)
 
 # ------------------------------
 # Historical Prices
 # ------------------------------
 @router.get("/stock/{symbol}/history", operation_id="get_stock_historical_prices")
 async def get_stock_historical_prices(symbol: str, period: str = "1mo", interval: str = "1d") -> dict:
-    try:
-        ticker = yf.Ticker(symbol)
-        hist = ticker.history(period=period, interval=interval)
-        if not hist.empty:
-            hist.index = hist.index.astype(str)
-            return {"symbol": symbol, "historical_prices": hist.to_dict(orient="records")}
-        raise HTTPException(status_code=404, detail="Historical data not available for this symbol or period.")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error fetching historical data: {e}")
-
+    return await yfin_service.get_stock_historical_prices(symbol, period, interval)
 
 # ------------------------------
 # Stock Info / Metadata
 # ------------------------------
 @router.get("/stock/{symbol}/info", operation_id="get_stock_info")
 async def get_stock_info(symbol: str) -> dict:
-    try:
-        ticker = yf.Ticker(symbol)
-        info = ticker.info
-        if info:
-            return {"symbol": symbol, "info": info}
-        raise HTTPException(status_code=404, detail="Info not available for this symbol.")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error fetching stock info: {e}")
-
+    return await yfin_service.get_stock_info(symbol)
 
 # ------------------------------
 # Dividends
 # ------------------------------
 @router.get("/stock/{symbol}/dividends", operation_id="get_stock_dividends")
 async def get_stock_dividends(symbol: str) -> dict:
-    try:
-        ticker = yf.Ticker(symbol)
-        dividends = ticker.dividends
-        if not dividends.empty:
-            return {"symbol": symbol, "dividends": dividends.to_dict()}
-        raise HTTPException(status_code=404, detail="Dividends not available for this symbol.")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error fetching dividends: {e}")
-
-
+    return await yfin_service.get_stock_dividends(symbol)
 # ------------------------------
 # Splits
 # ------------------------------
 @router.get("/stock/{symbol}/splits", operation_id="get_stock_splits")
 async def get_stock_splits(symbol: str) -> dict:
-    try:
-        ticker = yf.Ticker(symbol)
-        splits = ticker.splits
-        if not splits.empty:
-            return {"symbol": symbol, "splits": splits.to_dict()}
-        raise HTTPException(status_code=404, detail="Splits not available for this symbol.")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error fetching splits: {e}")
-
+    return await yfin_service.get_stock_splits(symbol)
 
 # ------------------------------
 # Financials (Income Statement, Balance Sheet, Cashflow)
 # ------------------------------
 @router.get("/stock/{symbol}/financials", operation_id="get_stock_financials")
 async def get_stock_financials(symbol: str) -> dict:
-    try:
-        ticker = yf.Ticker(symbol)
-        return {
-            "symbol": symbol,
-            "financials": {
-                "income_statement": ticker.financials.to_dict() if not ticker.financials.empty else {},
-                "balance_sheet": ticker.balance_sheet.to_dict() if not ticker.balance_sheet.empty else {},
-                "cashflow": ticker.cashflow.to_dict() if not ticker.cashflow.empty else {},
-            }
-        }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error fetching financials: {e}")
-
+    return await yfin_service.get_stock_financials(symbol)
 
 # ------------------------------
 # Analyst Recommendations
 # ------------------------------
 @router.get("/stock/{symbol}/recommendations", operation_id="get_stock_recommendations")
 async def get_stock_recommendations(symbol: str) -> dict:
-    try:
-        ticker = yf.Ticker(symbol)
-        recs = ticker.recommendations
-        if recs is not None and not recs.empty:
-            recs.index = recs.index.astype(str)
-            return {"symbol": symbol, "recommendations": recs.to_dict(orient="records")}
-        raise HTTPException(status_code=404, detail="Recommendations not available for this symbol.")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error fetching recommendations: {e}")
-
+    return await yfin_service.get_stock_recommendations(symbol)
 
 # ------------------------------
 # News
 # ------------------------------
 @router.get("/stock/{symbol}/news", operation_id="get_stock_news")
 async def get_stock_news(symbol: str) -> dict:
-    try:
-        ticker = yf.Ticker(symbol)
-        news = ticker.news
-        if news:
-            return {"symbol": symbol, "news": news}
-        raise HTTPException(status_code=404, detail="News not available for this symbol.")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error fetching news: {e}")
+    return await yfin_service.get_stock_news(symbol)

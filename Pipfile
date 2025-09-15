@@ -12,7 +12,6 @@ black = "*"
 uvicorn = "*"
 google-generativeai = "*"
 mcp = "*"
-fastapi-mcp = "*"
 pytz = "*"
 tzdata = "*"
 numpy = "*"
@@ -20,11 +19,17 @@ pandas = "*"
 yfinance = "*"
 fastapi = "*"
 python-dateutil = "*"
+fastapi-mcp = "*"
+sentence-transformers = "*"
+qdrant-client = "*"
+langchain-community = "*"
+pypdf = "*"
+langchain-text-splitters = "*"
 
 [dev-packages]
 
 [requires]
-python_version = "3.13"
+python_version = "3.12"
 
 [pipenv]
 allow_prereleases = true
