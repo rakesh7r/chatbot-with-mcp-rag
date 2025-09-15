@@ -1197,11 +1197,11 @@
         },
         "narwhals": {
             "hashes": [
-                "sha256:06d958b03e3e3725ae16feee6737b4970991bb52e8465ef75f388c574732ac59",
-                "sha256:a71931f7fb3c8e082cbe18ef0740644d87d60eba841ddfa9ba9394de1d43062f"
+                "sha256:7e213f9ca7db3f8bf6f7eff35eaee6a1cf80902997e1b78d49b7755775d8f423",
+                "sha256:8ae0b6f39597f14c0dc52afc98949d6f8be89b5af402d2d98101d2f7d3561418"
             ],
             "markers": "python_version >= '3.9'",
-            "version": "==2.4.0"
+            "version": "==2.5.0"
         },
         "networkx": {
             "hashes": [

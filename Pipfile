@@ -4,7 +4,6 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-streamlit = "*"
 python-dotenv = "*"
 pydantic = "*"
 google-genai = "*"
@@ -25,6 +24,7 @@ qdrant-client = "*"
 langchain-community = "*"
 pypdf = "*"
 langchain-text-splitters = "*"
+streamlit = "*"
 
 [dev-packages]
 

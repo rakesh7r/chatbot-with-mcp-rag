@@ -15,12 +15,27 @@ router = APIRouter()
 async def root():
     return {"message": "Cognito app!"}
 
+def parse_history( history_data: List[ChatType]):
+    parsed = []
+    for h in history_data:
+        parsed.append({
+            "role": "user",
+            "parts": [{"text": h.prompt}]
+        })
+        if h.response:
+            parsed.append({
+                "role": "model",
+                "parts": [{"text": h.response}]
+            })
+    return parsed
+
+
 @router.post("/chat")
 async def chat(req: ChatRequest):
     try:
         prompt = req.prompt
         history_data = req.history
-        parsed_history = gemini_client.parse_history([ChatType(**h) for h in history_data])
+        parsed_history = parse_history(history_data=history_data)
         response = await gemini_client.send_message(prompt, parsed_history)
         if response:
             return JSONResponse(content=json.loads(response), status_code=200)
@@ -61,7 +76,7 @@ async def file_chat(req: ChatRequest):
     try:
         prompt = req.prompt
         history_data = req.history
-        parsed_history = gemini_client.parse_history([ChatType(**h) for h in history_data])
+        parsed_history = parse_history(history_data=history_data)
         response = await gemini_client.rag_answer(query=prompt, top_k=5)
         if response:
             return JSONResponse(content=json.loads(response), status_code=200)

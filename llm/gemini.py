@@ -12,30 +12,14 @@ load_dotenv()
 
 SYSTEM_INSTRUCTION = """
 You're a helpful assistant designed to provide clear, structured responses.
-- Format your responses in valid JSON.
 - If applicable, use markdown formatting inside JSON (e.g., for descriptions).
 - Be concise but detailed when necessary.
 
 {
-  "status": "string (success, error, info)",
-  "prompt": "string (original prompt)",
-  "message": "string (detailed description of the response)",
-  "data": {
-    "items" : [
-      {
-        "name": "string (name of the item)",
-        "description": "string (description of the item)"
-      }
-    ],
-    "suggestions": ["string (suggested actions or next steps)"],
-    "citations": ["string array (optional, for providing sources or references)"]
-  }
+    answer : string
 }
-
 Use markdown formatting inside JSON (e.g., for description and response).
-Suggestions are prompt suggestions for the user based on the previous chats.
-Return only best 3 suggestions and citations if any.
-All responses must strictly adhere to this structure. Only return JSON—no extra text or explanations.
+All responses must strictly adhere to this structure.
 """
 
 GENERATION_CONFIG = {
@@ -52,7 +36,10 @@ RAG_SYSTEM_INSTRUCTION = """
   - If the answer is not in the context, say you don’t know.
   - Keep answers concise, factual, and well-structured.
   - Do not invent information beyond the given context.
-  
+  answer format 
+  {
+    answer : string
+  }
   - format your responses into a valid markdown.
 """
 

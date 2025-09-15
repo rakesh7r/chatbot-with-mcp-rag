@@ -10,7 +10,7 @@ class HistoryItem(BaseModel):
 
 class ChatType(BaseModel):
     prompt: str
-    response: Optional[Dict[str, Any]] = None
+    response: Optional[str] = None
 
 class ChatRequest(BaseModel):
     prompt: str
