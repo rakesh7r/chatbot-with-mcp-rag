@@ -1,6 +1,7 @@
 from qdrant_client import QdrantClient
 from embed.gemma import get_embedding
 from sentence_transformers import SentenceTransformer
+import uuid
 
 embed = SentenceTransformer("intfloat/e5-small-v2")
 
@@ -9,12 +10,14 @@ qdrant_client = QdrantClient(host="localhost", port=6333)
 
 collection_name = "documents"
 
-qdrant_client.recreate_collection(
-    collection_name=collection_name,
-    vectors_config={"size": 384, "distance": "Cosine"}  # e.g., Sentence-BERT embeddings
-)
+if qdrant_client.collection_exists(collection_name):
+    print(f"Collection '{collection_name}' exists. Deleting it for a fresh start.")
+else: 
+    qdrant_client.recreate_collection(
+        collection_name=collection_name,
+        vectors_config={"size": 384, "distance": "Cosine"}  # e.g., Sentence-BERT embeddings
+    )
 
-import uuid
 
 def push_chunks_to_qdrant(chunks):
     # Generate embeddings

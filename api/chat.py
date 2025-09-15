@@ -5,7 +5,8 @@ from llm.gemini import gemini_client
 import json
 from typing import List
 from langchain.pdf_loader import load_and_split_pdf
-
+import tempfile
+from vectorstore.qdrant import push_chunks_to_qdrant
 
 router = APIRouter()
 
@@ -41,8 +42,38 @@ async def upload_pdf(file: UploadFile = File(...)):
     # Validate file type
     if not file.filename.endswith(".pdf"):
         raise HTTPException(status_code=400, detail="Only PDF files are allowed")
+    
+    # Save to a temporary file
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
+        tmp.write(await file.read())
+        tmp_path = tmp.name
+        
     print(f"Received file: {file.filename}")
-    chunks = await load_and_split_pdf(file.file)
+    print("temp_path", tmp_path)
+    chunks = await load_and_split_pdf(tmp_path)
     print(f"Loaded and split into {len(chunks)} chunks.")
+    
+    push_chunks_to_qdrant(chunks=chunks)
     return {"filename": file.filename, "chunks": len(chunks)}
     
+@router.post("/file-chat")
+async def file_chat(req: ChatRequest):
+    try:
+        prompt = req.prompt
+        history_data = req.history
+        parsed_history = gemini_client.parse_history([ChatType(**h) for h in history_data])
+        response = await gemini_client.rag_answer(query=prompt, top_k=5)
+        if response:
+            return JSONResponse(content=json.loads(response), status_code=200)
+        else:
+            return JSONResponse(
+                content={
+                    "status": "error",
+                    "prompt": prompt,
+                    "message": "No response from the model",
+                    "data": {"items": [], "suggestions": [], "citations": []},
+                },
+                status_code=200,
+            )
+    except Exception as e:
+        return JSONResponse(content={"error": str(e)}, status_code=500)

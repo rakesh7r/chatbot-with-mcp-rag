@@ -10,26 +10,26 @@ from llm.gemini import gemini_client
 
 load_dotenv()
 
-# app = FastAPI()
+app = FastAPI()
 
-# app.include_router(chat, prefix="/api", tags=["chat"])
-# app.include_router(yfin, prefix="/api/yfin", tags=["yfin"])
+app.include_router(chat, prefix="/api", tags=["chat"])
+app.include_router(yfin, prefix="/api/yfin", tags=["yfin"])
 
 
-async def main():
-    chunks = await load_and_split_pdf("/Users/rakeshg/Downloads/The Rust Programming Language 13-40.pdf")
-    print(f"Loaded and split into {len(chunks)} chunks.")
-    push_chunks_to_qdrant(chunks=chunks)
+# async def main():
+#     chunks = await load_and_split_pdf("/Users/rakeshg/Downloads/The Rust Programming Language 13-40.pdf")
+#     print(f"Loaded and split into {len(chunks)} chunks.")
+#     push_chunks_to_qdrant(chunks=chunks)
     
-    query = "What is the Anatomy of a Rust Program?"
-    results = semantic_search(query=query, top_k=5)
-    print(f"Search results for query '{query}':", results)
-    res = await gemini_client.rag_answer(query=query, top_k=5)
-    print("RAG answer:", res)
+#     query = "What is the Anatomy of a Rust Program?"
+#     results = semantic_search(query=query, top_k=5)
+#     print(f"Search results for query '{query}':", results)
+#     res = await gemini_client.rag_answer(query=query, top_k=5)
+#     print("RAG answer:", res)
     
     
     
 
-if __name__ == "__main__":
-    import asyncio
-    asyncio.run(main())
+# if __name__ == "__main__":
+#     import asyncio
+#     asyncio.run(main())

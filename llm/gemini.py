@@ -52,6 +52,8 @@ RAG_SYSTEM_INSTRUCTION = """
   - If the answer is not in the context, say you don’t know.
   - Keep answers concise, factual, and well-structured.
   - Do not invent information beyond the given context.
+  
+  - format your responses into a valid markdown.
 """
 
 
