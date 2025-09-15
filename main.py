@@ -6,7 +6,7 @@ from api.yfin import router as yfin
 
 from langchain.pdf_loader import load_and_split_pdf
 from vectorstore.qdrant import push_chunks_to_qdrant, semantic_search
-
+from llm.gemini import gemini_client
 
 load_dotenv()
 
@@ -24,6 +24,8 @@ async def main():
     query = "What is the Anatomy of a Rust Program?"
     results = semantic_search(query=query, top_k=5)
     print(f"Search results for query '{query}':", results)
+    res = await gemini_client.rag_answer(query=query, top_k=5)
+    print("RAG answer:", res)
     
     
     

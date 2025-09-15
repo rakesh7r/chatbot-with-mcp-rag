@@ -55,7 +55,6 @@ RAG_SYSTEM_INSTRUCTION = """
 """
 
 
-
 class GeminiClient: 
     _instance = None
 
@@ -69,7 +68,13 @@ class GeminiClient:
         self.model = genai.GenerativeModel(
             model_name="gemini-2.0-flash-lite-preview-02-05",
             generation_config=GENERATION_CONFIG,
-            system_instruction=SYSTEM_INSTRUCTION,
+            system_instruction=SYSTEM_INSTRUCTION,  # ✅ system instruction goes here
+            tools=[]
+        )
+        self.rag_model = genai.GenerativeModel(
+            model_name="gemini-2.0-flash-lite-preview-02-05",
+            generation_config=GENERATION_CONFIG,
+            system_instruction=RAG_SYSTEM_INSTRUCTION, 
             tools=[]
         )
 
@@ -85,39 +90,35 @@ class GeminiClient:
     async def send_message(self, message: str, history: List[HistoryItem]):
         chat = self.model.start_chat(history=history)
         response = chat.send_message(message)
-
         return response.text
       
     async def rag_answer(self, query: str, top_k: int = 5):
-      """
-      Runs semantic search + passes results to Gemini for final answer.
-      """
-      # Step 1: Retrieve docs from Qdrant
-      search_results = semantic_search(query, top_k=top_k)
+        """
+        Runs semantic search + passes results to Gemini for final answer.
+        """
+        # Step 1: Retrieve docs from Qdrant
+        search_results = semantic_search(query, top_k=top_k)
       
-      # Step 2: Extract text from payloads
-      context_docs = "\n\n".join(
-          [doc["payload"].get("text", "") for doc in search_results if doc["payload"]]
-      )
+        # Step 2: Extract text from payloads
+        context_docs = "\n\n".join(
+            [doc["payload"].get("text", "") for doc in search_results if doc["payload"]]
+        )
       
-      # Step 3: Construct prompt
-      prompt = f"""
-      Context documents:
-      {context_docs}
-      
-      User query:
-      {query}
-      
-      Answer:
-      """
+        # Step 3: Construct prompt (as user role only)
+        prompt = f"""
+        Context documents:
+        {context_docs}
+        
+        User query:
+        {query}
+        
+        Answer:
+        """
 
-      response = self.model.generate_content(
-          contents=[
-              {"role": "system", "parts": SYSTEM_INSTRUCTION},
-              {"role": "user", "parts": prompt}
-          ]
-      )      
-      return response.text
+        response = self.rag_model.generate_content(
+            contents=[{"role": "user", "parts": [prompt]}] 
+        )
+        return response.text
 
 
 gemini_client = GeminiClient()
