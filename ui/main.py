@@ -1,5 +1,5 @@
 import streamlit as st
-from api_service import chat, upload_pdf, file_chat
+from api_service import chat, upload_pdf, file_chat, get_stock_info
 
 # Set page configuration
 st.set_page_config(page_title="RAG Chat", page_icon="💬", layout="wide")
@@ -33,7 +33,9 @@ def add_user_message():
     if st.session_state.user_input:
         # print("User input:", st.session_state.user_input)
         # print("From file:", st.session_state.from_file)
-        if st.session_state.from_file:
+        if st.session_state.stocks:
+            res = get_stock_info(st.session_state.user_input)
+        elif st.session_state.from_file:
             res = file_chat(st.session_state.user_input, st.session_state.messages)
         else:
             res = chat(st.session_state.user_input, st.session_state.messages)
@@ -44,6 +46,7 @@ def add_user_message():
 
 # User input
 st.checkbox("Answer from uploaded file", key="from_file", value=False)
+st.checkbox("Ask about Stocks", key="stocks", value=False)
 st.text_input("Type your message:", key="user_input", on_change=add_user_message)
 
 # Display chat messages

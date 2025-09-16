@@ -28,3 +28,10 @@ def upload_pdf(file):
     response = requests.post(f"{BASE_URL}/api/upload-pdf/", files=files)
     response.raise_for_status()
     return response.json()
+
+def get_stock_info(query: str):
+    """Fetch stock information from backend API."""
+    response = requests.post(f"{BASE_URL}/api/mcp/planner?req={query}")
+    response.raise_for_status()
+    print(response.json())
+    return response.json().get("answer", "No response from API")

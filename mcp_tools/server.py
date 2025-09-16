@@ -11,6 +11,7 @@ from services.yfin import (
     get_stock_recommendations,
     get_stock_news,
 )
+from llm.gemini import gemini_client
 
 mcp = FastMCP("Stock MCP Server")
 
@@ -71,9 +72,10 @@ async def stock_planner(query: str):
     # ------------------------------
     # Extract stock symbol (heuristic: look for uppercase ticker)
     # ------------------------------
-    match = re.search(r"\b[A-Z]{1,5}\b", query)
+    match = re.search(r"\b[A-Z]{1,10}\b", query)
     symbol = match.group(0) if match else "AAPL"  # default fallback
-
+    symbol = f"{symbol.upper()}.NS" # assuming NSE stocks for this example
+    
     # ------------------------------
     # Historical Prices
     # ------------------------------
@@ -158,15 +160,15 @@ tool_map = {
     "get_stock_news": (tool_news, SymbolRequest),
 }
 
-@router.post("/plan")
-@router.post("/plan")
+
+@router.post("/planner")
 async def plan(req: str):
     res = await stock_planner(req)
     tool = res.get("tool")
     args = res.get("args")
 
     if not tool:
-        return res
+        return res  # fallback message from planner
 
     if tool not in tool_map:
         raise HTTPException(status_code=400, detail=f"Unknown tool: {tool}")
@@ -174,9 +176,31 @@ async def plan(req: str):
     tool_fn, model = tool_map[tool]
 
     try:
-        req_obj = model(**args)  # ✅ convert dict to Pydantic request
+        # ✅ Convert to correct Pydantic request
+        req_obj = model(**args)
+
+        # ✅ Run MCP tool (fetch data from yfinance service)
         result = await tool_fn(req_obj)
+
+        # ✅ Ensure result is JSON-safe before passing to Gemini
+        import json
+        structured_result = json.dumps(result, indent=2, ensure_ascii=False)
+
+        # ✅ Summarize using Gemini (ask for markdown output)
+        prompt = f"""
+        Summarize the following stock data into a clear, well-structured **Markdown report**.
+        Use headings (###), bullet points, and highlight key insights.
+
+        Stock Query: "{req}"
+        Tool: {tool}
+
+        Raw Data:
+        {structured_result}
+        """
+
+        summary = await gemini_client.stock_summarizer(prompt)
+
+        return summary
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
-    return {"tool": tool, "args": args, "result": result}
