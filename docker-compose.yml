@@ -10,17 +10,6 @@ services:
       - qdrant_storage:/qdrant/storage
     restart: unless-stopped
 
-  ui: 
-    build:
-      context: ./ui/
-      dockerfile: Dockerfile
-
-    container_name: mcp-rag-streamlit-ui
-    ports:
-      - "8501:8501"
-    environment:
-      API_BASE_URL: ${API_BASE_URL}
-    restart: unless-stopped
   api:
     build: ./
     container_name: mcp-rag
@@ -34,6 +23,19 @@ services:
       - qdrant
     restart: unless-stopped
 
+  ui: 
+    build:
+      context: ./ui
+      dockerfile: Dockerfile
+
+    container_name: mcp-rag-streamlit-ui
+    ports:
+      - "8501:8501"
+    environment:
+      API_BASE_URL: ${API_BASE_URL}
+    depends_on:
+      - api
+    restart: unless-stopped
 
 volumes:
   qdrant_storage:

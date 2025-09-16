@@ -1,5 +1,6 @@
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 from app.api.chat import router as chat
 from app.api.yfin import router as yfin
@@ -12,6 +13,14 @@ from app.mcp_tools.server import router as mcp_router
 load_dotenv()
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Adjust this in production for security
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.include_router(chat, prefix="/api", tags=["chat"])
 app.include_router(yfin, prefix="/api/yfin", tags=["yfin"])
