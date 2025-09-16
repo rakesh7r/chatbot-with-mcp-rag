@@ -12,6 +12,7 @@ services:
 
   api:
     build: ./
+    image: rakesh7r/mcp-rag:latest
     container_name: mcp-rag
     ports:
       - "9000:8001"
@@ -27,7 +28,7 @@ services:
     build:
       context: ./ui
       dockerfile: Dockerfile
-
+    image: rakesh7r/mcp-rag-streamlit:latest
     container_name: mcp-rag-streamlit-ui
     ports:
       - "8501:8501"
