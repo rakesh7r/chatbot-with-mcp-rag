@@ -1,0 +1,39 @@
+version: '3.9'
+
+services:
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: qdrant
+    ports:
+      - "6333:6333"
+    volumes:
+      - qdrant_storage:/qdrant/storage
+    restart: unless-stopped
+
+  ui: 
+    build:
+      context: ./ui/
+      dockerfile: Dockerfile
+
+    container_name: mcp-rag-streamlit-ui
+    ports:
+      - "8501:8501"
+    environment:
+      API_BASE_URL: ${API_BASE_URL}
+    restart: unless-stopped
+  api:
+    build: ./
+    container_name: mcp-rag
+    ports:
+      - "9000:8001"
+    environment:
+      QDRANT_HOST: ${QDRANT_HOST}
+      API_BASE_URL: ${API_BASE_URL}
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+    depends_on:
+      - qdrant
+    restart: unless-stopped
+
+
+volumes:
+  qdrant_storage:

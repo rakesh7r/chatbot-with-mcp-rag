@@ -2,11 +2,15 @@ from qdrant_client import QdrantClient
 from app.embed.gemma import get_embedding
 from sentence_transformers import SentenceTransformer
 import uuid
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 embed = SentenceTransformer("intfloat/e5-small-v2")
 
-
-qdrant_client = QdrantClient(host="localhost", port=6333)
+qdrant_host = os.getenv("QDRANT_HOST", "localhost")
+qdrant_client = QdrantClient(url=qdrant_host)
 
 collection_name = "documents"
 

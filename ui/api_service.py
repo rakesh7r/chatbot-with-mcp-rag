@@ -1,7 +1,10 @@
 import requests
+import os
+from dotenv import load_dotenv
+load_dotenv()
 
-BASE_URL = "http://localhost:8000"  # change if needed
-
+BASE_URL = os.getenv("API_BASE_URL", "http://localhost:8000")
+print(f"Using API base URL: {BASE_URL}")
 
 def chat(user_input: str, messages: list):
     """Call normal chat endpoint."""
