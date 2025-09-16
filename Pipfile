@@ -25,6 +25,7 @@ langchain-community = "*"
 pypdf = "*"
 langchain-text-splitters = "*"
 streamlit = "*"
+watchdog = "*"
 
 [dev-packages]
 

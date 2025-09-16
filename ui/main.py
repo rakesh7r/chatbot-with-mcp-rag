@@ -12,20 +12,27 @@ st.title("💬 RAG Chatbot")
 st.sidebar.header("Upload your file")
 uploaded_file = st.sidebar.file_uploader("Choose a file", type=["pdf", "txt", "docx"])
 
+# Initialize session state for chat
+if "messages" not in st.session_state:
+    st.session_state.messages = []
+
+if "user_input" not in st.session_state:
+    st.session_state.user_input = ""
+
+if "from_file" not in st.session_state:
+    st.session_state.from_file = False
+
 if uploaded_file:
     upload_pdf(uploaded_file)
     st.sidebar.success(f"Uploaded: {uploaded_file.name}")
     # You can process the file later using your API
     # For now, we just show the file name
 
-# Initialize session state for chat
-if "messages" not in st.session_state:
-    st.session_state.messages = []
 
 def add_user_message():
     if st.session_state.user_input:
-        print("User input:", st.session_state.user_input)
-        print("From file:", st.session_state.from_file)
+        # print("User input:", st.session_state.user_input)
+        # print("From file:", st.session_state.from_file)
         if st.session_state.from_file:
             res = file_chat(st.session_state.user_input, st.session_state.messages)
         else:
@@ -43,9 +50,3 @@ st.text_input("Type your message:", key="user_input", on_change=add_user_message
 for msg in st.session_state.messages:
     st.markdown(f"**You:** {msg['prompt']}")
     st.markdown(f"**Bot:** {msg['response']}")
-
-# Simulate bot response (only if API is not implemented yet)
-if st.session_state.messages and not st.session_state.messages[-1].get("response"):
-    user_msg = st.session_state.messages[-1]["prompt"]
-    bot_response = f"Echo: {user_msg}"  # simple placeholder response
-    st.session_state.messages[-1]["response"] = bot_response
