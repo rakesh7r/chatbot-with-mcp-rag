@@ -10,7 +10,6 @@ google-genai = "*"
 black = "*"
 uvicorn = "*"
 google-generativeai = "*"
-mcp = "*"
 pytz = "*"
 tzdata = "*"
 numpy = "*"
@@ -26,6 +25,8 @@ pypdf = "*"
 langchain-text-splitters = "*"
 streamlit = "*"
 watchdog = "*"
+mcp = "*"
+modelcontextprotocol = "*"
 
 [dev-packages]
 
