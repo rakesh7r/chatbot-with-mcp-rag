@@ -1,7 +1,7 @@
 from mcp.server.fastmcp import FastMCP
 from pydantic import BaseModel
 from typing import Optional
-from services.yfin import (
+from app.services.yfin import (
     get_stock_current_price,
     get_stock_historical_prices,
     get_stock_info,
@@ -11,7 +11,7 @@ from services.yfin import (
     get_stock_recommendations,
     get_stock_news,
 )
-from llm.gemini import gemini_client
+from app.llm.gemini import gemini_client
 
 mcp = FastMCP("Stock MCP Server")
 

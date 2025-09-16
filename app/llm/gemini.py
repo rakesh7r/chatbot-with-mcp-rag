@@ -1,10 +1,10 @@
 import google.generativeai as genai
 import os
 from dotenv import load_dotenv
-from schema.chat import ChatType, HistoryItem
+from app.schema.chat import ChatType, HistoryItem
 from typing import List
 
-from vectorstore.qdrant import semantic_search
+from app.vectorstore.qdrant import semantic_search
 
 
 load_dotenv()

@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException
-from services import yfin as yfin_service
+from app.services import yfin as yfin_service
 
 router = APIRouter(tags=["yfin"], prefix="/api/yfin")
 

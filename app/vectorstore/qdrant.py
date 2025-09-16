@@ -1,5 +1,5 @@
 from qdrant_client import QdrantClient
-from embed.gemma import get_embedding
+from app.embed.gemma import get_embedding
 from sentence_transformers import SentenceTransformer
 import uuid
 

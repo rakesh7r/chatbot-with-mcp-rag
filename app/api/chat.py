@@ -1,12 +1,12 @@
 from fastapi import APIRouter, Request, UploadFile, HTTPException, File
 from fastapi.responses import JSONResponse
-from schema.chat import ChatRequest, ChatType
-from llm.gemini import gemini_client
+from app.schema.chat import ChatRequest, ChatType
+from app.llm.gemini import gemini_client
 import json
 from typing import List
-from langchain.pdf_loader import load_and_split_pdf
+from app.langchain.pdf_loader import load_and_split_pdf
 import tempfile
-from vectorstore.qdrant import push_chunks_to_qdrant
+from app.vectorstore.qdrant import push_chunks_to_qdrant
 
 router = APIRouter()
 
