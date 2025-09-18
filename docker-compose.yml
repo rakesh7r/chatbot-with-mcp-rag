@@ -15,7 +15,7 @@ services:
     image: docker.io/rakesh7r/mcp-rag:latest
     container_name: mcp-rag
     ports:
-      - "9000:8001"
+      - "8001:8001"
     environment:
       QDRANT_HOST: ${QDRANT_HOST}
       API_BASE_URL: ${API_BASE_URL}
