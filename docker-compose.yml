@@ -24,19 +24,19 @@ services:
       - qdrant
     restart: unless-stopped
 
-  ui: 
-    build:
-      context: ./ui
-      dockerfile: Dockerfile
-    image: docker.io/rakesh7r/mcp-rag-streamlit:latest
-    container_name: mcp-rag-streamlit-ui
-    ports:
-      - "8501:8501"
-    environment:
-      API_BASE_URL: ${API_BASE_URL}
-    depends_on:
-      - api
-    restart: unless-stopped
+  # ui: 
+  #   build:
+  #     context: ./ui
+  #     dockerfile: Dockerfile
+  #   image: docker.io/rakesh7r/mcp-rag-streamlit:latest
+  #   container_name: mcp-rag-streamlit-ui
+  #   ports:
+  #     - "8501:8501"
+  #   environment:
+  #     API_BASE_URL: ${API_BASE_URL}
+  #   depends_on:
+  #     - api
+  #   restart: unless-stopped
 
 volumes:
   qdrant_storage:
