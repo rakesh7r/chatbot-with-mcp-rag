@@ -14,16 +14,8 @@ qdrant_client = QdrantClient(url=qdrant_host)
 
 collection_name = "documents"
 
-if qdrant_client.collection_exists(collection_name):
-    print(f"Collection '{collection_name}' exists. Deleting it for a fresh start.")
-else: 
-    qdrant_client.recreate_collection(
-        collection_name=collection_name,
-        vectors_config={"size": 384, "distance": "Cosine"}  # e.g., Sentence-BERT embeddings
-    )
 
-
-def push_chunks_to_qdrant(chunks):
+def push_chunks_to_qdrant(chunks, collection: str= collection_name):
     # Generate embeddings
     print("Generating embeddings for chunks...")
     vectors = embed.encode(chunks, batch_size=32, show_progress_bar=True).tolist()
@@ -43,16 +35,26 @@ def push_chunks_to_qdrant(chunks):
     ]
     
     # print("points", points)
-
-    # Push to Qdrant
+    
+    if qdrant_client.collection_exists(collection):
+        pass
+    else:
+        qdrant_client.recreate_collection(
+            collection_name=collection,
+            vectors_config={"size": 384, "distance": "Cosine"}  # e.g., Sentence-BERT embeddings
+        )
+    
+    # Upsert points to Qdrant
+    print(f"Pushing {len(points)} points to Qdrant collection '{collection}'...")
     qdrant_client.upsert(
-        collection_name=collection_name,
+        collection_name=collection,
         points=points
     )
+        
     print(f"Pushed {len(chunks)} chunks to Qdrant collection '{collection_name}'")
 
 
-def semantic_search(query: str, top_k: int = 5):
+def semantic_search(query: str, top_k: int = 5, collection:str = collection_name):
     """
     Perform semantic search in Qdrant for a given query.
     
@@ -68,7 +70,7 @@ def semantic_search(query: str, top_k: int = 5):
     
     # Search in Qdrant
     results = qdrant_client.search(
-        collection_name=collection_name,
+        collection_name=collection,
         query_vector=query_vector,
         limit=top_k
     )

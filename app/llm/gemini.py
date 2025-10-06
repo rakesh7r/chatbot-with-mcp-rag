@@ -127,12 +127,12 @@ class GeminiClient:
         response = chat.send_message(message)
         return response.text
       
-    async def rag_answer(self, query: str, top_k: int = 5):
+    async def rag_answer(self, query: str, filename: str, top_k: int = 5, ):
         """
         Runs semantic search + passes results to Gemini for final answer.
         """
         # Step 1: Retrieve docs from Qdrant
-        search_results = semantic_search(query, top_k=top_k)
+        search_results = semantic_search(query, top_k=top_k, collection=filename)
       
         # Step 2: Extract text from payloads
         context_docs = "\n\n".join(

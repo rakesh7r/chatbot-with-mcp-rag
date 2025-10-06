@@ -68,7 +68,7 @@ async def upload_pdf(file: UploadFile = File(...)):
     chunks = await load_and_split_pdf(tmp_path)
     print(f"Loaded and split into {len(chunks)} chunks.")
     
-    push_chunks_to_qdrant(chunks=chunks)
+    push_chunks_to_qdrant(chunks=chunks, collection=file.filename)
     return {"filename": file.filename, "chunks": len(chunks)}
     
 @router.post("/file-chat")
@@ -76,8 +76,12 @@ async def file_chat(req: ChatRequest):
     try:
         prompt = req.prompt
         history_data = req.history
+        filename = req.filename
+        if not filename:
+            raise HTTPException(status_code=400, detail="Filename is required for file-chat")
+        
         parsed_history = parse_history(history_data=history_data)
-        response = await gemini_client.rag_answer(query=prompt, top_k=5)
+        response = await gemini_client.rag_answer(query=prompt, filename=filename, top_k=5)
         if response:
             return JSONResponse(content=json.loads(response), status_code=200)
         else:

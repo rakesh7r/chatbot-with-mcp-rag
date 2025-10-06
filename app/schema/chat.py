@@ -15,6 +15,7 @@ class ChatType(BaseModel):
 class ChatRequest(BaseModel):
     prompt: str
     history: List[ChatType] = []
+    filename: Optional[str] = None
 
 class ResponseSchema(BaseModel):
     status: str
