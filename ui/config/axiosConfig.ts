@@ -1,11 +1,10 @@
-import axios from "axios"
-
+import axios from "axios";
 
 const axiosClient = axios.create({
-    baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3000/api",
-    headers: {
-        "Content-Type": "application/json",
-    },
-})
+  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3000/api",
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
 
-export default axiosClient
+export default axiosClient;
