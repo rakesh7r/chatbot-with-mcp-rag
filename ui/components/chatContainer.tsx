@@ -36,8 +36,13 @@ export default function ChatContainer() {
         history: [],
       });
       addMessage("assistant", resposne.answer);
-
       setPrompt("");
+      setTimeout(() => {
+        const chatContainer = document.querySelector(
+          ".chat-container"
+        ) as HTMLDivElement;
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+      }, 100);
     } catch (error) {
       console.error("Error sending message:", error);
     }
@@ -45,7 +50,7 @@ export default function ChatContainer() {
 
   return (
     <div className="flex flex-col overflow-y-auto p-4 w-[60vw] ">
-      <div className="h-[85vh]">
+      <div className="h-[85vh] pb-20 mb-32 chat-container overflow-y-auto">
         {history.map((msg, index) => (
           <div
             key={index}
