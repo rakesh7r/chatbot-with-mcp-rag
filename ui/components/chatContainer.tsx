@@ -3,14 +3,13 @@ import { Input } from "./ui/input"
 import Bubble from "./bubble"
 import { Button } from "./ui/button"
 import { ArrowUp } from "lucide-react"
-import { send } from "process"
 import { sendChat } from "@/services/api.service"
 import { useChatStore } from "@/store/chat"
 
 export default function ChatContainer() {
     const promptRef = useRef<HTMLInputElement>(null)
     const [prompt, setPrompt] = useState<string>("")
-    const { addMessage } = useChatStore()
+    const { addMessage, history } = useChatStore()
 
     useEffect(() => {
         promptRef.current?.focus()
@@ -47,7 +46,11 @@ export default function ChatContainer() {
     return (
         <div className="flex flex-col overflow-y-auto p-4 w-[60vw] ">
             <div className="h-[85vh]">
-                <Bubble message="hello" />
+                {history.map((msg, index) => (
+                    <div key={index} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
+                        <Bubble message={typeof msg.content === "object" ? JSON.stringify(msg.content) : msg.content} />
+                    </div>
+                ))}
             </div>
             <div className="fixed bottom-5 w-[60vw] flex justify-start items-center gap-2 bg-background p-2 rounded-xl shadow-md">
                 <Input placeholder="enter your message here" ref={promptRef} className="w-full" value={prompt} onChange={onPromptChange} onKeyDown={onPromptKeyDown} />

@@ -1,5 +1,6 @@
 import { create } from "zustand"
-import { persist, createJSONStorage } from "zustand/middleware"
+import { persist, devtools, createJSONStorage } from "zustand/middleware"
+import { immer } from "zustand/middleware/immer"
 
 interface HistoryItem {
     role: string
@@ -23,26 +24,38 @@ interface ChatState {
 }
 
 export const useChatStore = create<ChatState>()(
-    persist<ChatState>(
-        (set) => ({
-            type: "chat",
-            isFile: false,
-            fileName: "",
-            history: [],
-            setType: (type) => set({ type }),
-            setIsFile: (isFile) => set({ isFile }),
-            setFileName: (fileName) => set({ fileName }),
-            setHistory: (history) => set({ history }),
-            addMessage: (role, content) =>
-                set((state) => ({
-                    history: [...state.history, { role, content }],
-                })),
-            clearHistory: () => set({ history: [] }),
-            createNewChat: () => set({ type: "chat", isFile: false, fileName: "", history: [] }),
-        }),
-        {
-            name: "chat-storage",
-            storage: createJSONStorage(() => localStorage), // ✅ ensures proper storage interface
-        }
+    devtools(
+        persist(
+            immer((set) => ({
+                type: "chat",
+                isFile: false,
+                fileName: "",
+                history: [],
+
+                setType: (type) => set({ type }),
+                setIsFile: (isFile) => set({ isFile }),
+                setFileName: (fileName) => set({ fileName }),
+                setHistory: (history) => set({ history }),
+
+                addMessage: (role, content) =>
+                    set((state) => {
+                        state.history.push({ role, content }) // Immer allows mutation syntax
+                    }),
+
+                clearHistory: () => set({ history: [] }),
+
+                createNewChat: () =>
+                    set({
+                        type: "chat",
+                        isFile: false,
+                        fileName: "",
+                        history: [],
+                    }),
+            })),
+            {
+                name: "chat-storage",
+                storage: createJSONStorage(() => localStorage),
+            }
+        )
     )
 )
