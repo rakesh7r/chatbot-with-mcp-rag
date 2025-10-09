@@ -12,7 +12,7 @@ export const sendChat = async (payload: ChatPayload) => {
   return response.data;
 };
 
-export const uploadPdf = async (file: File) => {
+export const uploadFile = async (file: File) => {
   const formData = new FormData();
   formData.append("file", file);
   const response = await axiosClient.post(chatUrls.uploadPdf, formData, {

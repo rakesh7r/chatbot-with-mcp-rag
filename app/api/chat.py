@@ -52,7 +52,7 @@ async def chat(req: ChatRequest):
     except Exception as e:
         return JSONResponse(content={"error": str(e)}, status_code=500)
 
-@router.post("/upload-pdf/")
+@router.post("/upload-pdf")
 async def upload_pdf(file: UploadFile = File(...)):
     # Validate file type
     if not file.filename.endswith(".pdf"):
