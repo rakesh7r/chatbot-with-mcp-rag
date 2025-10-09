@@ -21,6 +21,8 @@ interface ChatState {
   addMessage: (role: string, content: string) => void;
   clearHistory: () => void;
   createNewChat: () => void;
+  isStockChat: boolean;
+  setStockChat: (flag: boolean) => void;
 }
 
 const defaultChatHistory: HistoryItem[] = [
@@ -49,7 +51,8 @@ export const useChatStore = create<ChatState>()(
           }),
 
         clearHistory: () => set({ history: [] }),
-
+        isStockChat: true,
+        setStockChat: (flag) => set({ isStockChat: flag }),
         createNewChat: () =>
           set({
             type: "chat",

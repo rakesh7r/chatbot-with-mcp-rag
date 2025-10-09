@@ -3,13 +3,13 @@ import { Input } from "./ui/input"
 import Bubble from "./bubble"
 import { Button } from "./ui/button"
 import { ArrowUp, Paperclip } from "lucide-react"
-import { fileChat, sendChat, uploadFile } from "@/services/api.service"
+import { fileChat, getStorkInsights, sendChat, uploadFile } from "@/services/api.service"
 import { useChatStore } from "@/store/chat"
 
 export default function ChatContainer() {
     const promptRef = useRef<HTMLInputElement>(null)
     const [prompt, setPrompt] = useState<string>("")
-    const { addMessage, history, setIsFile, isFile } = useChatStore()
+    const { addMessage, history, setIsFile, isFile, isStockChat } = useChatStore()
     const inputRef = useRef<HTMLInputElement>(null)
     const [file, setFile] = useState<File | null>(null)
     const [loading, setLoading] = useState<boolean>(false)
@@ -29,7 +29,7 @@ export default function ChatContainer() {
             sendMessageHandler()
             return
         } else {
-          set
+            return
         }
         return
     }
@@ -37,7 +37,10 @@ export default function ChatContainer() {
     const sendMessageHandler = async () => {
         try {
             setLoading(true)
-            if (isFile) {
+            if (isStockChat) {
+              const resposne = await getStorkInsights(prompt)
+              addMessage("assistant", resposne)
+            } else if (isFile) {
                 const response = await fileChat({
                     prompt,
                     history: [],

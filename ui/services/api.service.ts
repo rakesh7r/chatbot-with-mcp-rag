@@ -27,3 +27,8 @@ export const fileChat = async (payload: ChatPayload) => {
   const response = await axiosClient.post(chatUrls.fileChat, payload);
   return response.data;
 };
+
+export const getStorkInsights = async (text: string) => {
+  const response = await axiosClient.post(mcpUrls.planner(text));
+  return response.data;
+};
