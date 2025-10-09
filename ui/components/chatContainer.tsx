@@ -93,7 +93,7 @@ export default function ChatContainer() {
             <div className="h-[85vh] mb-24 chat-container overflow-y-auto">
                 {history.map((msg, index) => (
                     <div key={index} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
-                        <Bubble message={msg.content} />
+                        <Bubble message={typeof msg.content === "string" ? msg.content : JSON.stringify(msg.content)} />
                     </div>
                 ))}
             </div>
