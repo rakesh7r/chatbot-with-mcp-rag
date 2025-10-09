@@ -1,11 +1,13 @@
-import google.generativeai as genai
 import os
 from dotenv import load_dotenv
-from app.schema.chat import ChatType, HistoryItem
+from openai import OpenAI
 from typing import List
 
+from app.schema.chat import ChatType, HistoryItem
 from app.vectorstore.qdrant import semantic_search
 
+
+load_dotenv()
 
 load_dotenv()
 
@@ -143,83 +145,87 @@ f{MARKDOWN_INSTRUCTION}
 """
 
 
-class GeminiClient: 
+MODEL_NAME = "gpt-4o-mini"
+class OpenAIClient: 
     _instance = None
 
     def __new__(cls):
         if cls._instance is None:
-            cls._instance = super(GeminiClient, cls).__new__(cls)
-            genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+            cls._instance = super(OpenAIClient, cls).__new__(cls)
+            cls._instance.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
         return cls._instance
-    
-    def __init__(self):
-        self.model = self.make_model(SYSTEM_INSTRUCTION)
-        self.rag_model = self.make_model(RAG_SYSTEM_INSTRUCTION)
-        self.stock_model = self.make_model(STOCK_SUMMARY_INSTRUCTION)  
 
-    def make_model(self, system_instruction: str):
-        return genai.GenerativeModel(
-            model_name="gemini-2.0-flash-lite-preview-02-05",
-            generation_config=GENERATION_CONFIG,
-            system_instruction=system_instruction, 
-            tools=[]
-        )
-
-    def parse_history(self, history: List[ChatType]) -> List[HistoryItem]:
-        parsed = []
+    def parse_history(self, history: List[ChatType]) -> List[dict]:
+        messages = []
         for item in history:
             if item.prompt:
-                parsed.append({"role": "user", "parts": [{"text": item.prompt}]})
-                if item.response:
-                    parsed.append({"role": "model", "parts": [{"text": item.response}]})
-        return parsed
-    
+                messages.append({"role": "user", "content": item.prompt})
+            if item.response:
+                messages.append({"role": "assistant", "content": item.response})
+        return messages
+
     async def send_message(self, message: str, history: List[HistoryItem]):
-        chat = self.model.start_chat(history=history)
-        response = chat.send_message(message)
-        return response.text
-      
-    async def rag_answer(self, query: str, filename: str, top_k: int = 5, ):
-        """
-        Runs semantic search + passes results to Gemini for final answer.
-        """
-        # Step 1: Retrieve docs from Qdrant
+        messages = [{"role": "system", "content": SYSTEM_INSTRUCTION}]
+        messages.extend(self.parse_history(history))
+        messages.append({"role": "user", "content": message})
+
+        response = self.client.chat.completions.create(
+            model=MODEL_NAME,
+            messages=messages,
+            temperature=0.8,
+            max_tokens=2000,
+        )
+
+        return response.choices[0].message.content.strip()
+
+    async def rag_answer(self, query: str, filename: str, top_k: int = 5):
         search_results = semantic_search(query, top_k=top_k, collection=filename)
-      
-        # Step 2: Extract text from payloads
+
         context_docs = "\n\n".join(
             [doc["payload"].get("text", "") for doc in search_results if doc["payload"]]
         )
-      
-        # Step 3: Construct prompt (as user role only)
+
         prompt = f"""
         Context documents:
         {context_docs}
-        
+
         User query:
         {query}
-        
-        Answer:
+
+        Answer in markdown:
         """
 
-        response = self.rag_model.generate_content(
-            contents=[{"role": "user", "parts": [prompt]}] 
+        response = self.client.chat.completions.create(
+            model=MODEL_NAME,
+            messages=[
+                {"role": "system", "content": RAG_SYSTEM_INSTRUCTION},
+                {"role": "user", "content": prompt},
+            ],
+            temperature=0.7,
+            max_tokens=2500,
         )
-        return response.text
-    
+
+        return response.choices[0].message.content.strip()
+
     async def stock_summarizer(self, stock_data: str):
         prompt = f"""
-        Given the following stock data in JSON format, provide a detailed summary highlighting key insights, trends, and any notable changes. Use markdown formatting for clarity.
-        provide response in plain text with markdown formatting.
-        
+        Given the following stock data (JSON), summarize key insights, trends, and notable changes.
+        Use markdown formatting for clarity.
+
         Stock Data:
         {stock_data}
-        use markdown for formatting the response
         """
-        response = self.stock_model.generate_content(
-            contents=[{"role": "user", "parts": [prompt]}]
+
+        response = self.client.chat.completions.create(
+            model=MODEL_NAME,
+            messages=[
+                {"role": "system", "content": STOCK_SUMMARY_INSTRUCTION},
+                {"role": "user", "content": prompt},
+            ],
+            temperature=0.7,
+            max_tokens=1500,
         )
-        return response.text
 
-
-gemini_client = GeminiClient()
+        return response.choices[0].message.content.strip()
+    
+openai_client = OpenAIClient()

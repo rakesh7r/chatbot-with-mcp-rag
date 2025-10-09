@@ -29,7 +29,7 @@ export default function ChatContainer() {
             sendMessageHandler()
             return
         } else {
-            return
+            promptRef.current?.focus()
         }
         return
     }
@@ -38,21 +38,21 @@ export default function ChatContainer() {
         try {
             setLoading(true)
             if (isStockChat) {
-              const resposne = await getStorkInsights(prompt)
-              addMessage("assistant", resposne)
+                const resposne = await getStorkInsights(prompt)
+                addMessage("assistant", resposne)
             } else if (isFile) {
                 const response = await fileChat({
                     prompt,
                     history: [],
                     filename: file?.name,
                 })
-                addMessage("assistant", response.answer)
+                addMessage("assistant", response)
             } else {
                 const resposne = await sendChat({
                     prompt,
                     history: [],
                 })
-                addMessage("assistant", resposne.answer)
+                addMessage("assistant", resposne)
             }
             setPrompt("")
             setTimeout(() => {
@@ -89,11 +89,11 @@ export default function ChatContainer() {
     }
 
     return (
-        <div className="flex flex-col overflow-y-auto p-4 w-[60vw] ">
+        <div className="flex flex-col overflow-y-auto p-4 w-[60vw]">
             <div className="h-[85vh] mb-24 chat-container overflow-y-auto">
                 {history.map((msg, index) => (
                     <div key={index} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
-                        <Bubble message={typeof msg.content === "object" ? JSON.stringify(msg.content) : msg.content} />
+                        <Bubble message={msg.content} />
                     </div>
                 ))}
             </div>

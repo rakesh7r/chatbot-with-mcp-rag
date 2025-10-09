@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Request, UploadFile, HTTPException, File
 from fastapi.responses import JSONResponse
 from app.schema.chat import ChatRequest, ChatType
-from app.llm.gemini import gemini_client
+from app.llm.openai import openai_client
 import json
 from typing import List
 from app.langchain.pdf_loader import load_and_split_pdf
@@ -36,9 +36,10 @@ async def chat(req: ChatRequest):
         prompt = req.prompt
         history_data = req.history
         parsed_history = parse_history(history_data=history_data)
-        response = await gemini_client.send_message(prompt, parsed_history)
+        response = await openai_client.send_message(prompt, parsed_history)
         if response:
-            return JSONResponse(content=json.loads(response), status_code=200)
+            # return JSONResponse(content=json.loads(response), status_code=200)
+            return response
         else:
             return JSONResponse(
                 content={
@@ -81,9 +82,10 @@ async def file_chat(req: ChatRequest):
             raise HTTPException(status_code=400, detail="Filename is required for file-chat")
         
         parsed_history = parse_history(history_data=history_data)
-        response = await gemini_client.rag_answer(query=prompt, filename=filename, top_k=5)
+        response = await openai_client.rag_answer(query=prompt, filename=filename, top_k=5)
         if response:
-            return JSONResponse(content=json.loads(response), status_code=200)
+            # return JSONResponse(content=json.loads(response), status_code=200)
+            return response
         else:
             return JSONResponse(
                 content={

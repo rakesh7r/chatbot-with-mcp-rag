@@ -120,3 +120,28 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Markdown wrapping fix */
+.markdown-body pre {
+  white-space: pre-wrap !important;
+  /* wrap long code lines */
+  word-break: break-word;
+}
+
+.markdown-body code {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.markdown-body table {
+  width: 100%;
+  table-layout: fixed;
+  /* helps wrapping inside cells */
+  word-break: break-word;
+}
+
+.markdown-body td,
+.markdown-body th {
+  white-space: normal;
+  word-break: break-word;
+}

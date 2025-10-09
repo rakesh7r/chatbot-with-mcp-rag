@@ -11,7 +11,7 @@ from app.services.yfin import (
     get_stock_recommendations,
     get_stock_news,
 )
-from app.llm.gemini import gemini_client
+from app.llm.openai import openai_client
 
 mcp = FastMCP("Stock MCP Server")
 
@@ -198,7 +198,7 @@ async def plan(req: str):
         {structured_result}
         """
 
-        summary = await gemini_client.stock_summarizer(prompt)
+        summary = await openai_client.stock_summarizer(prompt)
 
         return summary
 
