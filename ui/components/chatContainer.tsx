@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { Input } from "./ui/input"
 import Bubble from "./bubble"
 import { Button } from "./ui/button"
@@ -21,6 +21,15 @@ export default function ChatContainer() {
     const onPromptChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setPrompt(e.target.value)
     }
+
+    const placeholder = useMemo(() => {
+        if (isStockChat) {
+            return "enter stock related query (stock symbol in CAPS)"
+        } else if (isFile) {
+            return "Please enter your file related query"
+        }
+        return "Please enter your message here"
+    }, [])
 
     const onPromptKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === "Enter" && !e.shiftKey) {
@@ -104,15 +113,7 @@ export default function ChatContainer() {
                         <Paperclip className="h-4 w-4" />
                     </Button>
                 </>
-                <Input
-                    disabled={loading}
-                    placeholder="enter your message here"
-                    ref={promptRef}
-                    className="w-full"
-                    value={prompt}
-                    onChange={onPromptChange}
-                    onKeyDown={onPromptKeyDown}
-                />
+                <Input disabled={loading} placeholder={placeholder} ref={promptRef} className="w-full" value={prompt} onChange={onPromptChange} onKeyDown={onPromptKeyDown} />
                 <Button disabled={loading} size={"icon"} className="float-right" onClick={sendMessageHandler}>
                     <ArrowUp />
                 </Button>
